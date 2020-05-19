@@ -105,8 +105,11 @@ class Client(object):
       existing_token: pass in token directly, it's used for cases better get token outside of SDK, e.x. GCP Cloud Functions
           or caller already has a token
     """
-    host = host or os.environ.get(KF_PIPELINES_ENDPOINT_ENV)
-    self._uihost = os.environ.get(KF_PIPELINES_UI_ENDPOINT_ENV, host)
+    self._load_context_setting_or_default()
+
+    host = host or os.environ.get(KF_PIPELINES_ENDPOINT_ENV, self._context_setting["endpoint"])
+    self._uihost = os.environ.get(KF_PIPELINES_UI_ENDPOINT_ENV, self._context_setting.get("uiendpoint", host))
+
     config = self._load_config(host, client_id, namespace, other_client_id, other_client_secret, existing_token)
     api_client = kfp_server_api.api_client.ApiClient(config)
     _add_generated_apis(self, kfp_server_api, api_client)
@@ -115,7 +118,6 @@ class Client(object):
     self._experiment_api = kfp_server_api.api.experiment_service_api.ExperimentServiceApi(api_client)
     self._pipelines_api = kfp_server_api.api.pipeline_service_api.PipelineServiceApi(api_client)
     self._upload_api = kfp_server_api.api.PipelineUploadServiceApi(api_client)
-    self._load_context_setting_or_default()
 
   def _load_config(self, host, client_id, namespace, other_client_id, other_client_secret, existing_token):
     config = kfp_server_api.configuration.Configuration()
@@ -225,6 +227,8 @@ class Client(object):
     else:
       self._context_setting = {
         'namespace': '',
+        'endpoint': None,
+        'uiendpoing': None
       }
 
   def set_user_namespace(self, namespace):
