@@ -58,7 +58,7 @@ def find_version(*file_path_parts):
 setup(
     name=NAME,
     version=find_version('kfp', '__init__.py'),
-    description='KubeFlow Pipelines SDK',
+    description='KubeFlow Pipelines SDK (B2W version)',
     author='google',
     install_requires=REQUIRES,
     packages=[
